@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">VOLTIFY</string>
+    <string name="account_label">MR. ABDULLAH KHAN</string>
+    <string name="default_meter">KE A/C # 1234567890123</string>
+</resources>

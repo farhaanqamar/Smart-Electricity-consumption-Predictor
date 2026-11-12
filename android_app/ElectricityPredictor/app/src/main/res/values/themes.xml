@@ -1,0 +1,18 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme -->
+    <style name="Theme.ElectricityPredictor" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Primary brand color -->
+        <item name="colorPrimary">@color/ke_orange_start</item>
+        <item name="colorPrimaryVariant">@color/ke_orange_accent</item>
+        <item name="colorOnPrimary">@color/text_on_orange</item>
+        
+        <!-- Status bar and navigation bar -->
+        <item name="android:statusBarColor">@color/canvas_bg</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
+        <item name="android:navigationBarColor">@color/canvas_bg</item>
+        
+        <!-- Background surface -->
+        <item name="android:windowBackground">@color/canvas_bg</item>
+    </style>
+</resources>
+

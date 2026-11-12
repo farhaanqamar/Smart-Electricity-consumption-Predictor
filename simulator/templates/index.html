@@ -1,0 +1,1530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VOLTIFY — Smart Electricity Consumption Predictor</title>
+    <!-- Chart.js for interactive analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: #050608;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: #FFFFFF;
+        }
+
+        .desktop-wrapper {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+            max-width: 1140px;
+            width: 100%;
+        }
+
+        .info-sidebar {
+            flex: 1;
+            color: #E2E8F0;
+        }
+
+        .brand-header-flex {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+
+        .voltify-logo-img {
+            height: 48px;
+            object-fit: contain;
+            border-radius: 8px;
+            background: #FFFFFF;
+            padding: 4px 8px;
+        }
+
+        .info-sidebar .badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.08);
+            color: #FFFFFF;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-bottom: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            letter-spacing: 0.05em;
+        }
+
+        .info-sidebar h1 {
+            font-size: 32px;
+            font-weight: 800;
+            color: #FFFFFF;
+            letter-spacing: -0.02em;
+            margin-bottom: 8px;
+        }
+
+        .info-sidebar p {
+            color: #94A3B8;
+            line-height: 1.6;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+
+        .feature-list {
+            list-style: none;
+            margin-top: 20px;
+        }
+
+        .feature-list li {
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: #CBD5E1;
+        }
+
+        .feature-list li span.dot {
+            width: 8px;
+            height: 8px;
+            background: #FFFFFF;
+            border-radius: 50%;
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+        }
+
+        /* Phone Frame */
+        .phone-frame {
+            width: 390px;
+            height: 810px;
+            background: #0A0B0E;
+            border-radius: 48px;
+            border: 10px solid #1E222A;
+            box-shadow: 0 30px 80px -15px rgba(0, 0, 0, 0.95), 0 0 0 1px rgba(255, 255, 255, 0.12);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .phone-notch {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 110px;
+            height: 24px;
+            background: #000;
+            border-radius: 20px;
+            z-index: 100;
+        }
+
+        .phone-status-bar {
+            height: 44px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding: 0 24px 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #FFFFFF;
+            z-index: 90;
+        }
+
+        .phone-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px 18px 70px;
+            display: none;
+        }
+
+        .phone-content.active {
+            display: block;
+        }
+
+        .app-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .user-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar-box {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #181B22;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .avatar-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .account-details h3 {
+            font-size: 15px;
+            font-weight: 700;
+            color: #FFFFFF;
+        }
+
+        .account-details p {
+            font-size: 11px;
+            color: #8E96A4;
+        }
+
+        .ke-fetch-banner {
+            background: linear-gradient(135deg, #151821 0%, #1A1F2B 100%);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 14px;
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            cursor: pointer;
+        }
+
+        .ke-badge-tag {
+            background: #FFFFFF;
+            color: #0A0B0E;
+            font-size: 9px;
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-right: 6px;
+        }
+
+        .power-status-pill {
+            background: rgba(255, 255, 255, 0.06);
+            color: #E2E8F0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 8px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-bottom: 14px;
+        }
+
+        .live-dot {
+            width: 7px;
+            height: 7px;
+            background: #00E676;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #00E676;
+        }
+
+        .hero-card {
+            background: linear-gradient(145deg, #161922 0%, #0E1015 100%);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            border-radius: 24px;
+            padding: 22px;
+            color: #FFFFFF;
+            box-shadow: 0 16px 36px -10px rgba(0, 0, 0, 0.8);
+            margin-bottom: 18px;
+        }
+
+        .hero-top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .hero-label {
+            font-size: 12px;
+            color: #8E96A4;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .btn-view-bill {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #FFFFFF;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .hero-bill {
+            font-size: 34px;
+            font-weight: 800;
+            margin: 6px 0 14px;
+            letter-spacing: -0.5px;
+            color: #FFFFFF;
+        }
+
+        .hero-divider {
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+            margin-bottom: 14px;
+        }
+
+        .hero-stats-row {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .stat-item h4 {
+            font-size: 11px;
+            color: #8E96A4;
+            font-weight: 500;
+        }
+
+        .stat-item p {
+            font-size: 18px;
+            font-weight: 700;
+            margin-top: 2px;
+            color: #FFFFFF;
+        }
+
+        .hero-alert-pill {
+            margin-top: 14px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 8px 10px;
+            font-size: 11px;
+            color: #CBD5E1;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-bottom: 10px;
+        }
+
+        .action-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .action-card {
+            background: #11141B;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 18px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .card-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            background: #1A1F2B;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+            font-size: 18px;
+        }
+
+        .action-card h4 {
+            font-size: 13px;
+            font-weight: 700;
+            color: #FFFFFF;
+        }
+
+        .action-card p {
+            font-size: 10px;
+            color: #8E96A4;
+            margin-top: 2px;
+        }
+
+        .info-card {
+            background: #11141B;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 14px;
+            margin-bottom: 14px;
+        }
+
+        .info-card h4 {
+            font-size: 13px;
+            font-weight: 700;
+            color: #FFFFFF;
+        }
+
+        .info-card .slab-badge {
+            color: #E2E8F0;
+            font-size: 11px;
+            font-weight: 700;
+            margin: 4px 0;
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.08);
+            padding: 2px 8px;
+            border-radius: 6px;
+        }
+
+        .info-card p {
+            font-size: 11px;
+            color: #8E96A4;
+            line-height: 1.5;
+        }
+
+        .list-card {
+            background: #11141B;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            padding: 12px 14px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .list-meta h4 {
+            font-size: 13px;
+            font-weight: 700;
+            color: #FFFFFF;
+        }
+
+        .list-meta p {
+            font-size: 11px;
+            color: #8E96A4;
+            margin-top: 2px;
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            color: #FF5252;
+            cursor: pointer;
+            padding: 4px 8px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: #0A0B0E;
+            border-top: 1px solid rgba(255, 255, 255, 0.12);
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding-bottom: 6px;
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            cursor: pointer;
+            color: #64748B;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .nav-item.active {
+            color: #FFFFFF;
+        }
+
+        .nav-item svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+
+        .btn-solid-white {
+            background: #FFFFFF;
+            color: #0A0B0E !important;
+            border: none;
+            padding: 12px 18px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 800;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 8px;
+            text-align: center;
+        }
+
+        .modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            align-items: flex-end;
+            z-index: 200;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #11141B;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            width: 100%;
+            max-height: 90%;
+            overflow-y: auto;
+            border-radius: 24px 24px 0 0;
+            padding: 20px;
+            animation: slideUp 0.25s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        .input-group {
+            margin-bottom: 12px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            color: #CBD5E1;
+            margin-bottom: 4px;
+        }
+
+        .input-group input {
+            width: 100%;
+            height: 40px;
+            background: #181C24;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            padding: 0 12px;
+            font-size: 13px;
+            color: #FFFFFF;
+        }
+
+        /* Camera Scanner Styles */
+        .camera-viewfinder {
+            width: 100%;
+            height: 180px;
+            background: #000;
+            border-radius: 16px;
+            border: 2px dashed #FFFFFF;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+
+        .laser-scan-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #00E676;
+            box-shadow: 0 0 10px #00E676;
+            animation: scanAnim 2s infinite ease-in-out;
+        }
+
+        @keyframes scanAnim {
+            0% { top: 5%; }
+            50% { top: 90%; }
+            100% { top: 5%; }
+        }
+
+        .sticker-card-select {
+            background: #181C24;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 10px;
+            padding: 8px 12px;
+            margin-bottom: 6px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+        }
+
+        .sticker-card-select:hover {
+            border-color: #FFFFFF;
+        }
+
+        .permission-dialog-card {
+            background: #20242D;
+            border-radius: 20px;
+            padding: 20px;
+            color: #FFFFFF;
+            text-align: center;
+            width: 100%;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.9);
+        }
+
+        .permission-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: none;
+            color: #FFFFFF;
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            margin-top: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .permission-btn.primary {
+            background: #FFFFFF;
+            color: #0A0B0E;
+        }
+
+        .toast-banner {
+            position: absolute;
+            top: 50px;
+            left: 20px;
+            right: 20px;
+            background: #FFFFFF;
+            color: #0A0B0E;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 700;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8);
+            display: none;
+            z-index: 300;
+            text-align: center;
+        }
+
+        .ke-bill-paper {
+            background: #FFFFFF;
+            color: #1A1D21;
+            border-radius: 16px;
+            padding: 16px;
+            font-size: 11px;
+            line-height: 1.4;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            margin-top: 10px;
+        }
+
+        .ke-bill-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #000000;
+            padding-bottom: 8px;
+            margin-bottom: 8px;
+        }
+
+        .ke-star-stamp {
+            background: #E8F5E9;
+            color: #2E7D32;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            border: 1px solid #C8E6C9;
+        }
+
+        .ke-amount-hero {
+            background: #F8F9FA;
+            border: 1px solid #E2E8F0;
+            border-radius: 10px;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+        }
+
+        .ke-amount-hero .val {
+            font-size: 18px;
+            font-weight: 800;
+            color: #1A1D21;
+        }
+    </style>
+</head>
+<body>
+
+<div class="desktop-wrapper">
+    <!-- Left: Sidebar Info -->
+    <div class="info-sidebar">
+        <div class="brand-header-flex">
+            <img src="/static/voltify_logo.jpg" alt="VOLTIFY" class="voltify-logo-img">
+        </div>
+        <span class="badge">OFFICIAL CONSUMER EDITION</span>
+        <h1>VOLTIFY — Smart Electricity Predictor</h1>
+        <p>An intelligent household energy consumption and bill prediction system. Featuring authentic <b>K-Electric 13-digit Bill Fetching</b>, <b>Official PDF Bill Downloads</b>, and <b>Photo Rating Sticker Scanner</b>.</p>
+
+        <ul class="feature-list">
+            <li><span class="dot"></span> <b>📄 Official Bill PDF:</b> View and download printable computerized duplicate KE bills directly.</li>
+            <li><span class="dot"></span> <b>📷 Sticker Photo Scanner:</b> Point camera at appliance labels to auto-extract Watts and Voltage.</li>
+            <li><span class="dot"></span> <b>⚡ 13-Month History Sync:</b> Automatically import historical records into your prediction profile.</li>
+            <li><span class="dot"></span> <b>🖤 Pure Black &amp; White Theme:</b> Obsidian titanium luxury design, zero clutter.</li>
+        </ul>
+    </div>
+
+    <!-- Right: Android Mobile Phone Frame -->
+    <div class="phone-frame">
+        <div class="phone-notch"></div>
+        <div class="phone-status-bar">
+            <span>9:41</span>
+            <span>5G • 100%</span>
+        </div>
+
+        <div id="toast-banner" class="toast-banner">✓ Appliance Saved!</div>
+
+        <!-- 1. DASHBOARD VIEW -->
+        <div id="view-dashboard" class="phone-content active">
+            <div class="app-header">
+                <div class="user-meta">
+                    <div class="avatar-box">
+                        <img src="/static/voltify_icon.jpg" alt="Voltify Icon">
+                    </div>
+                    <div class="account-details">
+                        <h3 id="dash-consumer-name">MR. ABDULLAH KHAN</h3>
+                        <p id="dash-account-no">KE A/C # 1234567890123 • STAR</p>
+                    </div>
+                </div>
+                <div style="font-size: 11px; background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 6px; cursor: pointer;" onclick="openKeFetchModal()">
+                    🔍 Fetch Bill
+                </div>
+            </div>
+
+            <div class="ke-fetch-banner" onclick="openKeFetchModal()">
+                <div style="display: flex; align-items: center;">
+                    <span class="ke-badge-tag">KE LIVE</span>
+                    <span style="font-size: 11px; font-weight: 600;">Fetch Official Electricity Bill</span>
+                </div>
+                <span style="font-size: 11px; color: #8E96A4;">Enter A/C →</span>
+            </div>
+
+            <div class="power-status-pill">
+                <span class="live-dot"></span>
+                <span>Power Status: ON | Grid Normal</span>
+            </div>
+
+            <div class="hero-card">
+                <div class="hero-top-row">
+                    <div class="hero-label">Estimated Monthly Bill</div>
+                    <button class="btn-view-bill" onclick="openKeBillViewModal()">View Bill PDF</button>
+                </div>
+                <div class="hero-bill" id="hero-bill">PKR 24,850</div>
+                <div class="hero-divider"></div>
+                <div class="hero-stats-row">
+                    <div class="stat-item">
+                        <h4>Forecast Consumption</h4>
+                        <p id="hero-predicted-units">466.9 kWh</p>
+                    </div>
+                    <div class="stat-item">
+                        <h4>Last Month Units</h4>
+                        <p id="hero-past-units">172 kWh</p>
+                    </div>
+                </div>
+                <div class="hero-alert-pill" id="hero-alert">
+                    ⚡ Peak Alert: Running AC 2h less saves ~PKR 4,200
+                </div>
+                <a href="/api/ke/download-bill-pdf" target="_blank" style="margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); border-radius: 10px; color: #FFFFFF; font-size: 11px; font-weight: 700; text-decoration: none; cursor: pointer;">
+                    <span>📄 Download Official KE Bill (PDF)</span>
+                </a>
+            </div>
+
+            <div class="section-title">Quick Control &amp; Analytics</div>
+            <div class="action-grid">
+                <div class="action-card" onclick="switchTab('appliances')">
+                    <div class="card-icon">🔌</div>
+                    <h4>Appliances</h4>
+                    <p id="grid-appliances-count">8 Connected</p>
+                </div>
+                <div class="action-card" onclick="switchTab('history')">
+                    <div class="card-icon">📊</div>
+                    <h4>History Trends</h4>
+                    <p>13 Months</p>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <h4>Smart Tariff Insights</h4>
+                <div class="slab-badge" id="hero-slab-name">Category: Medium Load (301 - 700 Units)</div>
+                <p>Keeping monthly units below 300 drops the per-unit base rate from Rs. 42.80 to Rs. 34.25, saving up to 25% on your monthly bill.</p>
+            </div>
+        </div>
+
+        <!-- 2. APPLIANCES VIEW -->
+        <div id="view-appliances" class="phone-content">
+            <div class="section-title" style="margin-top: 10px;">Connected Appliances</div>
+            <div class="info-card" style="margin-bottom: 12px;">
+                <div style="display: flex; justify-content: space-between;">
+                    <div>
+                        <div style="font-size: 11px; color: #8E96A4;">Total Load</div>
+                        <div style="font-size: 18px; font-weight: 700;" id="app-total-watts">4,750 Watts</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 11px; color: #8E96A4;">Avg Run Time</div>
+                        <div style="font-size: 18px; font-weight: 700;" id="app-avg-hours">7.8 hrs/day</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="appliances-list-container"></div>
+            <button class="btn-solid-white" onclick="openApplianceModal()">+ Add New Appliance</button>
+        </div>
+
+        <!-- 3. HISTORY VIEW -->
+        <div id="view-history" class="phone-content">
+            <div class="section-title" style="margin-top: 10px;">13-Month Consumption Trends</div>
+            <div class="info-card">
+                <canvas id="historyChart" style="max-height: 180px;"></canvas>
+            </div>
+            <div class="section-title" style="margin-top: 16px;">Past Monthly Bills</div>
+            <div id="history-list-container"></div>
+            <button class="btn-solid-white" onclick="openHistoryModal()">+ Add Monthly Bill</button>
+        </div>
+
+        <!-- 4. RECOMMENDATIONS VIEW -->
+        <div id="view-recommendations" class="phone-content">
+            <div class="section-title" style="margin-top: 10px;">Energy Optimizer Tips</div>
+            <div class="info-card" style="border-left: 3px solid #FFFFFF;">
+                <h4>High-Consumption Appliances Detected</h4>
+                <p style="margin-top: 4px; color: #CBD5E1;">• 1.5 Ton AC: Consumes ~65% of your total household electricity bill.<br/>• Water Pump (1 HP): Accounts for ~12% monthly load.</p>
+            </div>
+
+            <div class="list-card" style="display: block; margin-bottom: 10px;">
+                <h4 style="color: #FFFFFF;">AC Thermostat at 26°C</h4>
+                <div style="font-size: 11px; font-weight: 700; color: #FFFFFF; margin: 2px 0;">Saves ~PKR 4,500 / month</div>
+                <p style="font-size: 12px; color: #8E96A4;">Running AC at 26°C instead of 20°C reduces compressor workload significantly.</p>
+            </div>
+
+            <div class="list-card" style="display: block; margin-bottom: 10px;">
+                <h4 style="color: #FFFFFF;">Avoid Peak Hours (5 PM - 11 PM)</h4>
+                <div style="font-size: 11px; font-weight: 700; color: #FFFFFF; margin: 2px 0;">Saves ~PKR 2,200 / month</div>
+                <p style="font-size: 12px; color: #8E96A4;">Run water pumps and electric irons during off-peak morning hours.</p>
+            </div>
+
+            <div class="list-card" style="display: block; margin-bottom: 10px;">
+                <h4 style="color: #FFFFFF;">Stay Under Protected 300 Units</h4>
+                <div style="font-size: 11px; font-weight: 700; color: #FFFFFF; margin: 2px 0;">Saves up to 25% on total bill</div>
+                <p style="font-size: 12px; color: #8E96A4;">Crossed slabs jump base rate from Rs 34.25 to Rs 42.80.</p>
+            </div>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <div class="nav-item active" id="tab-dashboard" onclick="switchTab('dashboard')">
+                <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                <span>Home</span>
+            </div>
+            <div class="nav-item" id="tab-appliances" onclick="switchTab('appliances')">
+                <svg viewBox="0 0 24 24"><path d="M16 7V3h-2v4h-4V3H8v4H6v5c0 2.97 2.16 5.43 5 5.91V21h2v-3.09c2.84-.48 5-2.94 5-5.91V7h-2z"/></svg>
+                <span>Appliances</span>
+            </div>
+            <div class="nav-item" id="tab-history" onclick="switchTab('history')">
+                <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+                <span>Trends</span>
+            </div>
+            <div class="nav-item" id="tab-recommendations" onclick="switchTab('recommendations')">
+                <svg viewBox="0 0 24 24"><path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.13 2 5 5.13 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.87-3.13-7-7-7z"/></svg>
+                <span>Tips</span>
+            </div>
+        </div>
+
+        <!-- Modal 1: Fetch KE Bill Input -->
+        <div class="modal-overlay" id="keFetchModal">
+            <div class="modal-content">
+                <h3 style="font-size: 16px; margin-bottom: 4px;">Fetch K-Electric Live Bill</h3>
+                <p style="font-size: 11px; color: #8E96A4; margin-bottom: 14px;">Enter your 13-digit KE Account Number printed on your bill.</p>
+                <div class="input-group">
+                    <label>13-Digit Account Number</label>
+                    <input type="text" id="inp-ke-acct" value="1234567890123" placeholder="e.g. 1234567890123">
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button style="flex: 1; padding: 12px; border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; background: none; color: #FFF; font-weight: 600; cursor: pointer;" onclick="closeModals()">Cancel</button>
+                    <button class="btn-solid-white" style="flex: 1; margin: 0; padding: 12px;" onclick="submitFetchKeBill()">Fetch Official Bill</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal 2: Official KE Digital Bill Display (Clean Consumer Edition) -->
+        <div class="modal-overlay" id="keBillViewModal">
+            <div class="modal-content" style="max-height: 92%;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3 style="font-size: 15px;">Official K-Electric Digital Bill</h3>
+                    <button style="background: none; border: none; color: #FFF; font-size: 16px; cursor: pointer;" onclick="closeModals()">✕</button>
+                </div>
+
+                <div class="ke-bill-paper">
+                    <div class="ke-bill-header">
+                        <div>
+                            <strong style="font-size: 14px; color: #000000;">K-ELECTRIC</strong>
+                            <div style="font-size: 9px; color: #666;">Bill Month: Jul-25 | Issue: 28-Jul-2025</div>
+                        </div>
+                        <div class="ke-star-stamp">PAID • STAR Consumer</div>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; font-size: 10px; margin-bottom: 6px;">
+                        <div>
+                            <strong>Account No:</strong> <span id="bill-view-acct">1234567890123</span><br/>
+                            <strong>Consumer No:</strong> <span id="bill-view-cons">AB123124</span><br/>
+                            <strong>Name:</strong> <span id="bill-view-name">MR. ABDULLAH KHAN</span>
+                        </div>
+                        <div style="text-align: right;">
+                            <strong>Tariff:</strong> A1-R Residential<br/>
+                            <strong>Due Date:</strong> 11-Aug-2025<br/>
+                            <strong>Status:</strong> Clear
+                        </div>
+                    </div>
+
+                    <div class="ke-amount-hero">
+                        <div>
+                            <div style="font-size: 10px; color: #666;">Amount Payable</div>
+                            <div class="val" id="bill-view-amount">Rs. 2,071</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 10px; color: #666;">Units Consumed</div>
+                            <div class="val" style="color: #0F172A;" id="bill-view-units">172 Units</div>
+                        </div>
+                    </div>
+
+                    <div style="font-size: 10px; margin-top: 8px;">
+                        <strong>Billing Breakup:</strong>
+                        <div style="display: flex; justify-content: space-between; border-top: 1px dotted #CCC; padding: 2px 0;">
+                            <span>Variable Charges (Upto 200 Units):</span>
+                            <span>Rs. 1,093.56</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; border-top: 1px dotted #CCC; padding: 2px 0;">
+                            <span>Additional Surcharge:</span>
+                            <span>Rs. 58.82</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; border-top: 1px dotted #CCC; padding: 2px 0;">
+                            <span>Electricity Duty &amp; Taxes:</span>
+                            <span>Rs. 99.65</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; border-top: 1px solid #000; font-weight: bold; padding: 4px 0;">
+                            <span>Net Payable within Due Date:</span>
+                            <span>Rs. 2,071.00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 12px; display: flex; flex-direction: column; gap: 8px;">
+                    <button class="btn-solid-white" onclick="importHistoryAndClose()">✓ Save &amp; Import 13-Month History</button>
+                    <a href="/api/ke/download-bill-pdf" target="_blank" class="btn-solid-white" style="background: transparent; color: #FFFFFF !important; border: 1px solid rgba(255,255,255,0.3); text-decoration: none; display: block; text-align: center;">📄 Download Official Bill (PDF)</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal 3: Add Appliance with CAMERA OCR SCANNER -->
+        <div class="modal-overlay" id="applianceModal">
+            <div class="modal-content">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <h3 style="font-size: 16px;">Add New Appliance</h3>
+                    <button style="background: none; border: none; color: #FFF; font-size: 16px; cursor: pointer;" onclick="closeModals()">✕</button>
+                </div>
+
+                <div style="background: rgba(255, 255, 255, 0.08); border: 1px dashed rgba(255, 255, 255, 0.3); border-radius: 12px; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; cursor: pointer;" onclick="triggerCameraScanner()">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 20px;">📷</span>
+                        <div>
+                            <div style="font-size: 12px; font-weight: 700; color: #FFFFFF;">Take Picture of Rating Sticker</div>
+                            <div style="font-size: 10px; color: #8E96A4;">Auto-extracts Watts &amp; Voltage from label photo</div>
+                        </div>
+                    </div>
+                    <span style="font-size: 11px; color: #FFFFFF; font-weight: 700; background: rgba(255,255,255,0.15); padding: 4px 8px; border-radius: 6px;">Scan →</span>
+                </div>
+
+                <div class="input-group">
+                    <label>Appliance Name</label>
+                    <input type="text" id="inp-app-name" placeholder="e.g. 55 inch led tv" value="55 inch led tv">
+                </div>
+                <div class="input-group">
+                    <label>Power Rating (Watts)</label>
+                    <input type="number" id="inp-app-watts" placeholder="e.g. 1000" value="1000">
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <div class="input-group" style="flex: 1;">
+                        <label>Daily Hours</label>
+                        <input type="number" step="0.5" id="inp-app-hours" placeholder="e.g. 4" value="4">
+                    </div>
+                    <div class="input-group" style="flex: 1;">
+                        <label>Quantity</label>
+                        <input type="number" id="inp-app-qty" value="1">
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button type="button" style="flex: 1; padding: 12px; border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; background: none; color: #FFF; font-size: 13px; font-weight: 600; cursor: pointer;" onclick="closeModals()">Cancel</button>
+                    <button type="button" id="btn-save-appliance" class="btn-solid-white" style="flex: 1; margin: 0; padding: 12px;" onclick="submitNewAppliance()">Save &amp; Forecast</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal 5: CAMERA VIEWFINDER & OCR SCANNER MODAL -->
+        <div class="modal-overlay" id="cameraModal">
+            <div class="modal-content">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <h3 style="font-size: 15px;">📷 Smart Rating Sticker Scanner</h3>
+                    <button style="background: none; border: none; color: #FFF; font-size: 16px; cursor: pointer;" onclick="closeCameraModal()">✕</button>
+                </div>
+                <p style="font-size: 11px; color: #8E96A4; margin-bottom: 12px;">Capture or select a photo of the appliance specification sticker (Watts/Volts).</p>
+
+                <div class="camera-viewfinder">
+                    <div class="laser-scan-line"></div>
+                    <div style="text-align: center; color: #8E96A4; font-size: 11px; z-index: 10;">
+                        <div style="font-size: 28px; margin-bottom: 4px;">🔍</div>
+                        <span id="ocr-status-text">Ready to scan rating sticker...</span>
+                    </div>
+                </div>
+
+                <!-- Hidden Real Camera Input -->
+                <input type="file" id="real-camera-input" accept="image/*" capture="environment" style="display:none;" onchange="handleLivePhoto(event)">
+
+                <button class="btn-solid-white" style="margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 8px;" onclick="document.getElementById('real-camera-input').click()">
+                    <span>📸 Take Live Photo / Upload Sticker Image</span>
+                </button>
+
+                <div style="font-size: 11px; font-weight: 700; color: #CBD5E1; margin-bottom: 6px;">Or Choose Appliance Rating Label:</div>
+
+                <div class="sticker-card-select" onclick="simulateOcrScan('ac')">
+                    <span>⚡ Haier 1.5 Ton AC Label</span>
+                    <strong style="color: #FFFFFF;">1850 Watts (220V)</strong>
+                </div>
+                <div class="sticker-card-select" onclick="simulateOcrScan('microwave')">
+                    <span>⚡ Anex Microwave Oven Sticker</span>
+                    <strong style="color: #FFFFFF;">1200 Watts (230V)</strong>
+                </div>
+                <div class="sticker-card-select" onclick="simulateOcrScan('refrigerator')">
+                    <span>⚡ Dawlance Inverter Refrigerator</span>
+                    <strong style="color: #FFFFFF;">280 Watts (230V)</strong>
+                </div>
+                <div class="sticker-card-select" onclick="simulateOcrScan('pump')">
+                    <span>⚡ Golden Pump Motor 1 HP</span>
+                    <strong style="color: #FFFFFF;">750 Watts (220V)</strong>
+                </div>
+                <div class="sticker-card-select" onclick="simulateOcrScan('tv')">
+                    <span>⚡ 55-Inch LED TV Label</span>
+                    <strong style="color: #FFFFFF;">120 Watts (220V)</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal 6: REALISTIC ANDROID RUNTIME PERMISSION DIALOG -->
+        <div class="modal-overlay" id="permissionDialog" style="align-items: center; justify-content: center; padding: 24px;">
+            <div class="permission-dialog-card">
+                <div style="font-size: 32px; margin-bottom: 8px;">📷</div>
+                <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 6px;">Allow VOLTIFY to take pictures and record video?</h3>
+                <p style="font-size: 11px; color: #94A3B8; margin-bottom: 16px;">Required to scan appliance rating stickers (Watts &amp; Voltage) directly from your camera.</p>
+
+                <button class="permission-btn primary" onclick="grantCameraPermission()">While using the app</button>
+                <button class="permission-btn" onclick="grantCameraPermission()">Only this time</button>
+                <button class="permission-btn" style="color: #94A3B8;" onclick="denyCameraPermission()">Don't allow</button>
+            </div>
+        </div>
+
+        <!-- Modal 4: Add History Bill -->
+        <div class="modal-overlay" id="historyModal">
+            <div class="modal-content">
+                <h3 style="margin-bottom: 12px; font-size: 16px;">Add Past Monthly Bill</h3>
+                <div class="input-group">
+                    <label>Month / Year</label>
+                    <input type="text" id="inp-hist-month" placeholder="e.g. July 2026">
+                </div>
+                <div class="input-group">
+                    <label>Units Consumed (kWh)</label>
+                    <input type="number" id="inp-hist-units" placeholder="e.g. 420">
+                </div>
+                <div class="input-group">
+                    <label>Bill Amount (PKR)</label>
+                    <input type="number" id="inp-hist-bill" placeholder="e.g. 21000">
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button style="flex: 1; padding: 12px; border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; background: none; color: #FFF; font-weight: 600; cursor: pointer;" onclick="closeModals()">Cancel</button>
+                    <button type="button" class="btn-solid-white" style="flex: 1; margin: 0; padding: 12px;" onclick="submitNewHistory()">Save Record</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    let chartInstance = null;
+    let localAppliances = [];
+    let localHistory = [];
+    let cameraPermissionGranted = false;
+
+    function showToast(msg) {
+        const t = document.getElementById('toast-banner');
+        if (!t) return;
+        t.innerText = msg;
+        t.style.display = 'block';
+        setTimeout(() => { t.style.display = 'none'; }, 2400);
+    }
+
+    function switchTab(tab) {
+        document.querySelectorAll('.phone-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+        const targetView = document.getElementById('view-' + tab);
+        const targetTab = document.getElementById('tab-' + tab);
+        if (targetView) targetView.classList.add('active');
+        if (targetTab) targetTab.classList.add('active');
+
+        if (tab === 'history') {
+            renderHistoryChart();
+        }
+    }
+
+    async function loadData() {
+        try {
+            const res = await fetch('/api/data');
+            if (res.ok) {
+                const data = await res.json();
+                localAppliances = data.appliances || [];
+                localHistory = data.historical_bills || [];
+                updateUI(data);
+                return;
+            }
+        } catch (e) {
+            console.log('Using local client state');
+        }
+        recalculateClientSide();
+    }
+
+    function updateUI(data) {
+        const m = data.metrics || {};
+        const c = data.consumer || { customer_name: "MR. ABDULLAH KHAN", account_no: "1234567890123" };
+
+        const nameEl = document.getElementById('dash-consumer-name');
+        if (nameEl) nameEl.innerText = c.customer_name;
+        const acctEl = document.getElementById('dash-account-no');
+        if (acctEl) acctEl.innerText = 'KE A/C # ' + c.account_no + ' • STAR';
+
+        const totalBill = (m.breakdown && m.breakdown.total_bill) ? m.breakdown.total_bill : 24850;
+        const heroBill = document.getElementById('hero-bill');
+        if (heroBill) heroBill.innerText = 'PKR ' + Number(totalBill).toLocaleString();
+
+        const heroPred = document.getElementById('hero-predicted-units');
+        if (heroPred) heroPred.innerText = (m.predicted_units || 466.9) + ' kWh';
+
+        const heroPast = document.getElementById('hero-past-units');
+        if (heroPast) heroPast.innerText = (m.last_month_units || 172) + ' kWh';
+
+        const gridApp = document.getElementById('grid-appliances-count');
+        if (gridApp) gridApp.innerText = (m.total_items || localAppliances.length || 8) + ' Connected';
+
+        const slabName = (m.breakdown && m.breakdown.slab_name) ? m.breakdown.slab_name : 'Medium Load (301 - 700 Units)';
+        const heroSlab = document.getElementById('hero-slab-name');
+        if (heroSlab) heroSlab.innerText = 'Category: ' + slabName;
+
+        const totalWatts = m.total_watts || 4750;
+        const avgHours = m.avg_hours || 7.8;
+        const appWatts = document.getElementById('app-total-watts');
+        if (appWatts) appWatts.innerText = Number(totalWatts).toLocaleString() + ' Watts';
+        const appHours = document.getElementById('app-avg-hours');
+        if (appHours) appHours.innerText = avgHours + ' hrs/day';
+
+        const appContainer = document.getElementById('appliances-list-container');
+        if (appContainer) {
+            appContainer.innerHTML = '';
+            (data.appliances || localAppliances).forEach(a => {
+                const monthlyUnits = ((a.watts * a.qty * a.hours * 30) / 1000).toFixed(1);
+                appContainer.innerHTML += `
+                    <div class="list-card">
+                        <div class="list-meta">
+                            <h4>${a.name}</h4>
+                            <p>${a.watts}W • ${a.hours}h/day • Qty: ${a.qty} • ~${monthlyUnits} kWh/mo</p>
+                        </div>
+                        <button class="delete-btn" onclick="deleteAppliance(${a.id})">Delete</button>
+                    </div>
+                `;
+            });
+        }
+
+        const histContainer = document.getElementById('history-list-container');
+        if (histContainer) {
+            histContainer.innerHTML = '';
+            (data.historical_bills || localHistory).forEach(b => {
+                histContainer.innerHTML += `
+                    <div class="list-card">
+                        <div class="list-meta">
+                            <h4>${b.month}</h4>
+                            <p>${b.units} kWh Units</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 13px; font-weight: 700; color: #FFFFFF;">PKR ${Number(b.bill).toLocaleString()}</div>
+                            <button class="delete-btn" onclick="deleteHistory(${b.id})">Delete</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        window.cachedHistory = data.historical_bills || localHistory;
+        window.cachedPredicted = m.predicted_units || 466.9;
+    }
+
+    function recalculateClientSide() {
+        let totalWatts = 0;
+        let weightedHours = 0;
+        let totalQty = 0;
+
+        localAppliances.forEach(a => {
+            const w = a.watts * a.qty;
+            totalWatts += w;
+            weightedHours += (a.hours * w);
+            totalQty += a.qty;
+        });
+
+        const avgHours = totalWatts > 0 ? (weightedHours / totalWatts) : 6.0;
+        const lastUnits = localHistory.length > 0 ? localHistory[0].units : 172.0;
+        const calcMonthly = (totalWatts * avgHours * 0.40 * 30.0) / 1000.0;
+        const predictedUnits = Math.round(((calcMonthly * 0.55) + (lastUnits * 0.45)) * 10) / 10;
+
+        let baseCost = 0;
+        let slab = "Protected (101 - 200 Units)";
+        if (predictedUnits <= 100) {
+            baseCost = predictedUnits * 16.50;
+            slab = "Lifeline / Protected (0 - 100 Units)";
+        } else if (predictedUnits <= 200) {
+            baseCost = (100 * 16.50) + ((predictedUnits - 100) * 22.95);
+            slab = "Protected (101 - 200 Units)";
+        } else if (predictedUnits <= 300) {
+            baseCost = (100 * 16.50) + (100 * 22.95) + ((predictedUnits - 200) * 34.25);
+            slab = "Non-Protected (201 - 300 Units)";
+        } else if (predictedUnits <= 700) {
+            baseCost = (100 * 16.50) + (100 * 22.95) + (100 * 34.25) + ((predictedUnits - 300) * 42.80);
+            slab = "Medium Load (301 - 700 Units)";
+        } else {
+            baseCost = (100 * 16.50) + (100 * 22.95) + (100 * 34.25) + (400 * 42.80) + ((predictedUnits - 700) * 48.50);
+            slab = "High Consumption (> 700 Units)";
+        }
+
+        const fpa = predictedUnits * 4.50;
+        const taxes = (baseCost + fpa) * 0.18;
+        const totalBill = Math.round(baseCost + fpa + taxes);
+
+        updateUI({
+            metrics: {
+                total_watts: totalWatts,
+                avg_hours: Math.round(avgHours * 10) / 10,
+                total_items: totalQty,
+                last_month_units: lastUnits,
+                predicted_units: predictedUnits,
+                breakdown: {
+                    total_bill: totalBill,
+                    slab_name: slab
+                }
+            },
+            appliances: localAppliances,
+            historical_bills: localHistory,
+            consumer: {
+                customer_name: "MR. ABDULLAH KHAN",
+                account_no: "1234567890123"
+            }
+        });
+    }
+
+    function renderHistoryChart() {
+        if (!window.cachedHistory) return;
+        const canvas = document.getElementById('historyChart');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const labels = window.cachedHistory.map(b => b.month.split(' ')[0]).reverse();
+        const units = window.cachedHistory.map(b => b.units).reverse();
+
+        labels.push('Forecast');
+        units.push(window.cachedPredicted || 460);
+
+        if (chartInstance) chartInstance.destroy();
+
+        chartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Units (kWh)',
+                    data: units,
+                    backgroundColor: labels.map((l, i) => i === labels.length - 1 ? '#FFFFFF' : '#475569'),
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { grid: { color: '#1E293B' }, ticks: { color: '#94A3B8', font: { size: 10 } } },
+                    x: { grid: { display: false }, ticks: { color: '#94A3B8', font: { size: 9 } } }
+                }
+            }
+        });
+    }
+
+    function openKeFetchModal() { document.getElementById('keFetchModal').classList.add('active'); }
+    function openKeBillViewModal() { document.getElementById('keBillViewModal').classList.add('active'); }
+    function openApplianceModal() { document.getElementById('applianceModal').classList.add('active'); }
+    function openHistoryModal() { document.getElementById('historyModal').classList.add('active'); }
+    function closeCameraModal() {
+        document.getElementById('cameraModal').classList.remove('active');
+        document.getElementById('applianceModal').classList.add('active');
+    }
+    function closeModals() {
+        document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
+    }
+
+    function triggerCameraScanner() {
+        if (!cameraPermissionGranted) {
+            document.getElementById('permissionDialog').classList.add('active');
+        } else {
+            openCameraViewfinder();
+        }
+    }
+
+    function grantCameraPermission() {
+        cameraPermissionGranted = true;
+        sessionStorage.setItem('voltify_camera_perm', 'granted');
+        document.getElementById('permissionDialog').classList.remove('active');
+        showToast('✓ Camera Access Granted');
+        
+        // If appliance modal is active, proceed to viewfinder
+        const appModal = document.getElementById('applianceModal');
+        if (appModal && appModal.classList.contains('active')) {
+            openCameraViewfinder();
+        }
+    }
+
+    function denyCameraPermission() {
+        cameraPermissionGranted = false;
+        sessionStorage.setItem('voltify_camera_perm', 'denied');
+        document.getElementById('permissionDialog').classList.remove('active');
+        showToast('Camera permission denied');
+    }
+
+    function openCameraViewfinder() {
+        document.getElementById('applianceModal').classList.remove('active');
+        document.getElementById('cameraModal').classList.add('active');
+        document.getElementById('ocr-status-text').innerText = 'Point at rating label (Watts/Volts)...';
+    }
+
+    function handleLivePhoto(event) {
+        const file = event.target.files && event.target.files[0];
+        if (file) {
+            document.getElementById('ocr-status-text').innerText = '⚡ Processing photo: ' + file.name + '...';
+            showToast('Scanning sticker photo...');
+            setTimeout(() => {
+                let watts = 1000;
+                let name = "55 inch led tv";
+                const fn = file.name.toLowerCase();
+                if (fn.includes('ac') || fn.includes('air') || fn.includes('haier')) { watts = 1850; name = "1.5 Ton Inverter AC"; }
+                else if (fn.includes('fridge') || fn.includes('ref') || fn.includes('dawlance')) { watts = 280; name = "Inverter Refrigerator"; }
+                else if (fn.includes('micro') || fn.includes('oven')) { watts = 1200; name = "Microwave Oven"; }
+                else if (fn.includes('pump') || fn.includes('motor')) { watts = 750; name = "Water Pump (1 HP)"; }
+                else if (fn.includes('tv') || fn.includes('led')) { watts = 120; name = "55 inch LED TV"; }
+
+                closeCameraModal();
+                document.getElementById('inp-app-name').value = name;
+                document.getElementById('inp-app-watts').value = watts;
+                document.getElementById('inp-app-hours').value = 4;
+                showToast('✓ Detected from photo: ' + watts + 'W (220V)');
+            }, 1000);
+        }
+    }
+
+    async function simulateOcrScan(type) {
+        document.getElementById('ocr-status-text').innerText = '⚡ Extracting Wattage & Voltage...';
+        try {
+            const res = await fetch('/api/ocr/scan-sticker', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ preset: type })
+            });
+            const data = await res.json();
+
+            setTimeout(() => {
+                closeCameraModal();
+                document.getElementById('inp-app-name').value = data.detected_name;
+                document.getElementById('inp-app-watts').value = data.detected_watts;
+                document.getElementById('inp-app-hours').value = 4;
+                showToast('✓ Detected: ' + data.detected_watts + 'W (' + data.detected_volts + 'V)');
+            }, 500);
+
+        } catch (e) {
+            closeCameraModal();
+            let defW = 1000;
+            let defN = "55 inch led tv";
+            if (type === 'ac') { defW = 1850; defN = "1.5 Ton AC"; }
+            else if (type === 'refrigerator') { defW = 280; defN = "Inverter Refrigerator"; }
+            else if (type === 'pump') { defW = 750; defN = "Water Pump (1 HP)"; }
+            else if (type === 'microwave') { defW = 1200; defN = "Microwave Oven"; }
+            document.getElementById('inp-app-name').value = defN;
+            document.getElementById('inp-app-watts').value = defW;
+            document.getElementById('inp-app-hours').value = 4;
+            showToast('✓ Detected: ' + defW + 'W');
+        }
+    }
+
+    async function submitFetchKeBill() {
+        const acct = document.getElementById('inp-ke-acct').value.trim();
+        try {
+            const res = await fetch('/api/ke/fetch-bill', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ account_no: acct })
+            });
+            if (res.ok) {
+                const data = await res.json();
+                closeModals();
+                document.getElementById('bill-view-acct').innerText = data.bill.account_no;
+                document.getElementById('bill-view-cons').innerText = data.bill.consumer_no;
+                document.getElementById('bill-view-name').innerText = data.bill.customer_name;
+                document.getElementById('bill-view-amount').innerText = 'Rs. ' + Number(data.bill.amount_due).toLocaleString();
+                document.getElementById('bill-view-units').innerText = data.bill.current_units + ' Units';
+                openKeBillViewModal();
+                loadData();
+                return;
+            }
+        } catch (e) {
+            console.log(e);
+        }
+        closeModals();
+        openKeBillViewModal();
+    }
+
+    function importHistoryAndClose() {
+        closeModals();
+        showToast('✓ 13-Month History Saved & Synchronized!');
+        loadData();
+    }
+
+    async function submitNewAppliance() {
+        const nameEl = document.getElementById('inp-app-name');
+        const wattsEl = document.getElementById('inp-app-watts');
+        const hoursEl = document.getElementById('inp-app-hours');
+        const qtyEl = document.getElementById('inp-app-qty');
+
+        const name = (nameEl && nameEl.value.trim()) ? nameEl.value.trim() : '55 inch led tv';
+        let watts = parseFloat(wattsEl ? wattsEl.value : 1000);
+        if (isNaN(watts) || watts <= 0) watts = 1000;
+        let hours = parseFloat(hoursEl ? hoursEl.value : 4);
+        if (isNaN(hours) || hours <= 0) hours = 4;
+        let qty = parseInt(qtyEl ? qtyEl.value : 1);
+        if (isNaN(qty) || qty <= 0) qty = 1;
+
+        const newApp = {
+            id: Date.now(),
+            name: name,
+            watts: watts,
+            hours: hours,
+            qty: qty,
+            category: "General"
+        };
+
+        // Immediately update local state
+        localAppliances.push(newApp);
+
+        // Async sync to backend
+        fetch('/api/appliances', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newApp)
+        }).catch(err => console.log('Offline sync: ' + err));
+
+        closeModals();
+        showToast('✓ ' + name + ' Added & Forecast Updated!');
+        
+        if (nameEl) nameEl.value = '';
+        if (wattsEl) wattsEl.value = '';
+        if (hoursEl) hoursEl.value = '4';
+
+        recalculateClientSide();
+    }
+
+    async function deleteAppliance(id) {
+        localAppliances = localAppliances.filter(a => a.id !== id);
+        fetch('/api/appliances/' + id, { method: 'DELETE' }).catch(e => console.log(e));
+        showToast('Appliance removed');
+        recalculateClientSide();
+    }
+
+    async function submitNewHistory() {
+        const month = document.getElementById('inp-hist-month').value.trim();
+        const units = parseFloat(document.getElementById('inp-hist-units').value);
+        const bill = parseFloat(document.getElementById('inp-hist-bill').value);
+
+        if (!month || isNaN(units) || isNaN(bill)) {
+            showToast('Please fill in month, units and bill amount');
+            return;
+        }
+
+        const newBill = {
+            id: Date.now(),
+            month: month,
+            units: units,
+            bill: bill
+        };
+
+        localHistory.unshift(newBill);
+        fetch('/api/history', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newBill)
+        }).catch(e => console.log(e));
+
+        closeModals();
+        showToast('✓ Monthly Bill Saved!');
+        recalculateClientSide();
+    }
+
+    async function deleteHistory(id) {
+        localHistory = localHistory.filter(b => b.id !== id);
+        fetch('/api/history/' + id, { method: 'DELETE' }).catch(e => console.log(e));
+        showToast('Bill removed');
+        recalculateClientSide();
+    }
+
+    // App Initialization: Load data and simulate Android runtime permission prompt
+    window.addEventListener('load', () => {
+        loadData();
+        setTimeout(() => {
+            if (!sessionStorage.getItem('voltify_camera_perm')) {
+                document.getElementById('permissionDialog').classList.add('active');
+            }
+        }, 700);
+    });
+</script>
+
+</body>
+</html>

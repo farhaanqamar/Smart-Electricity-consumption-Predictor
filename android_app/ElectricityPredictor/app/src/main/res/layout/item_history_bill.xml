@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="10dp"
+    android:background="@drawable/bg_card_rounded"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:padding="16dp">
+
+    <ImageView
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="@drawable/bg_status_pill"
+        android:backgroundTint="@color/badge_cyan_bg"
+        android:padding="10dp"
+        android:src="@drawable/ic_analytics"
+        app:tint="@color/badge_cyan_text" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvMonthName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="October 2026"
+            android:textColor="@color/text_title"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvUnitsConsumed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="380 kWh Units"
+            android:textColor="@color/text_muted"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="end"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvBillAmountPkr"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="PKR 19,500"
+            android:textColor="@color/ke_orange_accent"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/btnDeleteBill"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:background="?attr/selectableItemBackground"
+            android:text="Delete"
+            android:textColor="@color/accent_danger"
+            android:textSize="11sp" />
+    </LinearLayout>
+
+</LinearLayout>
+
