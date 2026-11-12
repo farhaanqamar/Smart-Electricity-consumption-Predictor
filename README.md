@@ -240,7 +240,7 @@ Smart-Electricity-consumption-Predictor/
 ---
 
 ## 📜 License & Acknowledgments
-* **Author:** Farhan Qamar & Project Partner
+* **Author:** Talha Khan & Farhaan Qamar
 * **Supervisor:** Muhammad Imran Afzal
 * **Institution:** Virtual University of Pakistan (Spring 2026)
 * Developed as an academic Final Year Project (CS619). Free to use for academic and research purposes.
