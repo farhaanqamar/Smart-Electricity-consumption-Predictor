@@ -17,7 +17,7 @@ def add_header(response):
     response.headers['Expires'] = '-1'
     return response
 
-BASE_DIR = r"G:\farhan_fyp"
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TFLITE_MODEL_PATH = os.path.join(BASE_DIR, "ml_model", "models", "electricity_predictor.tflite")
 
 # Load TFLite Model
@@ -275,9 +275,7 @@ if __name__ == "__main__":
         pass
     print("\n" + "="*60)
     print("🚀 VOLTIFY Live Simulator running on:")
-    print("👉 http://127.0.0.1:5050")
     print("👉 Localhost: http://127.0.0.1:5050")
     print(f"👉 Mobile Wi-Fi: http://{local_ip}:5050")
     print("="*60 + "\n")
-    app.run(host="127.0.0.1", port=5050, debug=False)
     app.run(host="0.0.0.0", port=5050, debug=False)
