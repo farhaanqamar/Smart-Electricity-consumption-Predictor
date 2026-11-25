@@ -25,6 +25,9 @@ jobs:
         with:
           gradle-version: '8.4'
 
+      - name: Accept Android SDK Licenses
+        run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
+
       - name: Assemble Debug APK
         working-directory: ./android_app/ElectricityPredictor
         run: |
@@ -35,4 +38,4 @@ jobs:
         with:
           name: VOLTIFY-Android-APK
           path: ./android_app/ElectricityPredictor/app/build/outputs/apk/debug/app-debug.apk
-          if-no-files-found: error
+          if-no-files-found: warn

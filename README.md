@@ -4,6 +4,7 @@
 [![TensorFlow Lite](https://img.shields.io/badge/ML%20Engine-TensorFlow%20Lite%20(Edge)-white?style=for-the-badge&logo=tensorflow&logoColor=black)](https://github.com/farhaanqamar/Smart-Electricity-consumption-Predictor)
 [![Tariff](https://img.shields.io/badge/Tariff-NEPRA%20%2F%20K--Electric%202025--26-black?style=for-the-badge)](https://github.com/farhaanqamar/Smart-Electricity-consumption-Predictor)
 [![UI Theme](https://img.shields.io/badge/Design-Obsidian%20Monochrome%20Luxury-white?style=for-the-badge&logoColor=black)](https://github.com/farhaanqamar/Smart-Electricity-consumption-Predictor)
+[![Documentation](https://img.shields.io/badge/Features%20Guide-Complete%20Documentation-blue?style=for-the-badge)](file:///c:/Users/IQRA%20TRADERS/OneDrive/Desktop/farhan%20fyp/FEATURES_AND_DOCUMENTATION.md)
 
 ---
 
@@ -12,7 +13,8 @@
 * **Course:** CS619 Final Year Project (FYP)
 * **University:** Virtual University of Pakistan (Spring 2026)
 * **Supervisor:** Muhammad Imran Afzal (`imran.afzal@vu.edu.pk`)
-* **Project Lead:** Farhan Qamar & Partner
+* **Project Authors:** Talha Khan & Farhaan Qamar
+* **Features Documentation:** See [FEATURES_AND_DOCUMENTATION.md](file:///c:/Users/IQRA%20TRADERS/OneDrive/Desktop/farhan%20fyp/FEATURES_AND_DOCUMENTATION.md) for full breakdown of Camera OCR, KE Bill Fetcher, PDF Generator, ML Model, and UI system.
 * **Repository:** [https://github.com/farhaanqamar/Smart-Electricity-consumption-Predictor](https://github.com/farhaanqamar/Smart-Electricity-consumption-Predictor)
 
 ---

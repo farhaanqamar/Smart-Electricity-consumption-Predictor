@@ -264,8 +264,20 @@ def delete_history(bill_id):
     return jsonify({"success": True, "metrics": get_current_metrics()})
 
 if __name__ == "__main__":
+    import socket
+    local_ip = "127.0.0.1"
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        local_ip = s.getsockname()[0]
+        s.close()
+    except Exception:
+        pass
     print("\n" + "="*60)
     print("🚀 VOLTIFY Live Simulator running on:")
     print("👉 http://127.0.0.1:5050")
+    print("👉 Localhost: http://127.0.0.1:5050")
+    print(f"👉 Mobile Wi-Fi: http://{local_ip}:5050")
     print("="*60 + "\n")
     app.run(host="127.0.0.1", port=5050, debug=False)
+    app.run(host="0.0.0.0", port=5050, debug=False)
